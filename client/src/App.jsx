@@ -35,6 +35,12 @@ function RecipeSelector(props) {
   )
 }
 
+//Shopping list component
+
+//Recipe Searching component
+
+//
+
 function App() {
 
   const [recipes, setRecipes] = useState([{"name": "pasta", "instructions": "do the thing", "ingrediant": ["thing1", "thing2"]}])
