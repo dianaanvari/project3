@@ -9,7 +9,7 @@ const recipeSchema = new Schema({
 
   instructions: {
     type: String,
-    required: true
+    required: false
   },
 
   ingredients: {
