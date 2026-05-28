@@ -5,7 +5,8 @@ require("dotenv").config();
 
 const app = express();
 
-const Recipe = require ("./modules/recipe");
+const Recipe = require ("./modules/Recipe");
+const ShoppingList = require("./modules/ShoppingList");
 
 // Middleware
 app.use(cors());
@@ -55,6 +56,28 @@ app.delete("/api/recipes/:id", (req, res) => {
   Recipe.findByIdAndDelete(req.params.id)
     .then(() => {
       res.json({ success: true });
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err.message });
+    });
+});
+
+// SHOPPING LIST ROUTES
+app.get("/api/shoppinglist/:recipeId", (req, res) => {
+  ShoppingList.findOne({ recipeId: req.params.recipeId })
+    .then((list) => {
+      res.json(list);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/api/shoppinglist", (req, res) => {
+  const newList = new ShoppingList(req.body);
+  newList.save()
+    .then((saved) => {
+      res.json(saved);
     })
     .catch((err) => {
       res.status(500).json({ error: err.message });

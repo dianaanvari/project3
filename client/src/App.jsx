@@ -45,6 +45,8 @@ function App() {
  const [instructionsText, setInstructionsText] = useState("")
  const [ingredientsText, setIngredientsText] = useState("")
  const [greeting, setGreeting] = useState("")
+ const [shoppingListItems, setShoppingListItems] = useState([])
+ const [newItem, setNewItem] = useState("")
 
  useEffect(() => {
   fetch('http://localhost:5050/api/recipes')
@@ -100,6 +102,40 @@ const newRecipes = recipes.filter((_, i) => i !== currentRecipe)
 setRecipes(newRecipes)
 }
 
+const handleAddItem = async () => {
+  if (!newItem.trim()) return
+  
+  const updatedItems = [...shoppingListItems, newItem]
+  setShoppingListItems(updatedItems)
+  setNewItem("")
+}
+
+const handleSaveShoppingList = async () => {
+  if (!recipes[currentRecipe]) {
+    alert("No recipe selected!")
+    return
+  }
+  
+  await axios.post('http://localhost:5050/api/shoppinglist', {
+    items: shoppingListItems,
+    recipeId: recipes[currentRecipe]._id
+  })
+  alert("Shopping list saved!")
+}
+
+const handleLoadShoppingList = async () => {
+  if (!recipes[currentRecipe]) return
+  
+  try {
+    const response = await axios.get(`http://localhost:5050/api/shoppinglist/${recipes[currentRecipe]._id}`)
+    if (response.data) {
+      setShoppingListItems(response.data.items)
+    }
+  } catch (err) {
+    console.log("No shopping list for this recipe yet")
+  }
+}
+
 return (
     <div className="container">
       <div className="sidebar">
@@ -138,6 +174,23 @@ return (
         <button onClick={handleDelete}>Delete</button>
       </div>
 
+      <div className="shoppinglist">
+        <h2>Shopping List</h2>
+       <button onClick={handleLoadShoppingList}>Load Shopping List</button>
+       <ul>
+          {shoppingListItems.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+       </ul>
+       <input 
+          type="text" 
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
+          placeholder="Add item..."
+  />
+       <button onClick={handleAddItem}>Add Item</button>
+       <button onClick={handleSaveShoppingList}>Save Shopping List</button>
+      </div>  
     </div>
   )
 }
